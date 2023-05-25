@@ -2,15 +2,13 @@ package main
 
 import (
 	"fmt"
-	"image/color"
-	"log"
-	"math/rand"
-	"time"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"image/color"
+	"log"
+	"math/rand"
 )
 
 const (
@@ -43,10 +41,6 @@ type Game struct {
 	score         int
 	bestScore     int
 	level         int
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
 }
 
 func (g *Game) collidesWithApple() bool {
@@ -158,18 +152,18 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	for _, v := range g.snakeBody {
-		vector.DrawFilledRect(screen, float32(v.X*gridSize), float32(v.Y*gridSize), gridSize, gridSize, color.RGBA{0x80, 0xa0, 0xc0, 0xff}, false)
+		vector.DrawFilledRect(screen, float32(v.X*gridSize), float32(v.Y*gridSize), gridSize, gridSize, color.RGBA{R: 0x80, G: 0xa0, B: 0xc0, A: 0xff}, false)
 	}
-	vector.DrawFilledRect(screen, float32(g.apple.X*gridSize), float32(g.apple.Y*gridSize), gridSize, gridSize, color.RGBA{0xFF, 0x00, 0x00, 0xff}, false)
+	vector.DrawFilledRect(screen, float32(g.apple.X*gridSize), float32(g.apple.Y*gridSize), gridSize, gridSize, color.RGBA{R: 0xFF, A: 0xff}, false)
 
 	if g.moveDirection == dirNone {
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("Press up/down/left/right to start"))
+		ebitenutil.DebugPrint(screen, "Press up/down/left/right to start")
 	} else {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f Level: %d Score: %d Best Score: %d", ebiten.ActualFPS(), g.level, g.score, g.bestScore))
 	}
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+func (g *Game) Layout(_, _ int) (int, int) {
 	return screenWidth, screenHeight
 }
 
