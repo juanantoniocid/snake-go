@@ -2,12 +2,16 @@ package game
 
 import (
 	"fmt"
+	"image/color"
+	"math/rand"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"image/color"
-	"math/rand"
+
+	"juanantoniocid/snake/internal/apple"
+	"juanantoniocid/snake/internal/position"
 )
 
 const (
@@ -26,15 +30,10 @@ const (
 	dirUp
 )
 
-type Position struct {
-	X int
-	Y int
-}
-
 type Game struct {
 	moveDirection int
-	snakeBody     []Position
-	apple         Position
+	snakeBody     []position.Position
+	apple         *apple.Apple
 	timer         int
 	moveTime      int
 	score         int
@@ -43,8 +42,9 @@ type Game struct {
 }
 
 func (g *Game) collidesWithApple() bool {
-	return g.snakeBody[0].X == g.apple.X &&
-		g.snakeBody[0].Y == g.apple.Y
+	applePos := g.apple.GetPosition()
+	return g.snakeBody[0].X == applePos.X &&
+		g.snakeBody[0].Y == applePos.Y
 }
 
 func (g *Game) collidesWithSelf() bool {
@@ -69,8 +69,7 @@ func (g *Game) needsToMoveSnake() bool {
 }
 
 func (g *Game) reset() {
-	g.apple.X = 3 * gridSize
-	g.apple.Y = 3 * gridSize
+	g.setNewApple()
 	g.moveTime = 4
 	g.snakeBody = g.snakeBody[:1]
 	g.snakeBody[0].X = xGridCountInScreen / 2
@@ -107,9 +106,8 @@ func (g *Game) Update() error {
 		}
 
 		if g.collidesWithApple() {
-			g.apple.X = rand.Intn(xGridCountInScreen - 1)
-			g.apple.Y = rand.Intn(yGridCountInScreen - 1)
-			g.snakeBody = append(g.snakeBody, Position{
+			g.setNewApple()
+			g.snakeBody = append(g.snakeBody, position.Position{
 				X: g.snakeBody[len(g.snakeBody)-1].X,
 				Y: g.snakeBody[len(g.snakeBody)-1].Y,
 			})
@@ -149,11 +147,16 @@ func (g *Game) Update() error {
 	return nil
 }
 
+func (g *Game) setNewApple() {
+	g.apple = apple.NewApple(rand.Intn(xGridCountInScreen-1), rand.Intn(yGridCountInScreen-1), gridSize)
+}
+
 func (g *Game) Draw(screen *ebiten.Image) {
 	for _, v := range g.snakeBody {
 		vector.DrawFilledRect(screen, float32(v.X*gridSize), float32(v.Y*gridSize), gridSize, gridSize, color.RGBA{R: 0x80, G: 0xa0, B: 0xc0, A: 0xff}, false)
 	}
-	vector.DrawFilledRect(screen, float32(g.apple.X*gridSize), float32(g.apple.Y*gridSize), gridSize, gridSize, color.RGBA{R: 0xFF, A: 0xff}, false)
+
+	g.apple.Draw(screen)
 
 	if g.moveDirection == dirNone {
 		ebitenutil.DebugPrint(screen, "Press up/down/left/right to start")
@@ -168,11 +171,11 @@ func (g *Game) Layout(_, _ int) (int, int) {
 
 func NewGame() *Game {
 	g := &Game{
-		apple:     Position{X: 3 * gridSize, Y: 3 * gridSize},
 		moveTime:  4,
-		snakeBody: make([]Position, 1),
+		snakeBody: make([]position.Position, 1),
 	}
 	g.snakeBody[0].X = xGridCountInScreen / 2
 	g.snakeBody[0].Y = yGridCountInScreen / 2
+	g.setNewApple()
 	return g
 }
