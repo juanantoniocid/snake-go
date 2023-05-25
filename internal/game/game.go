@@ -2,16 +2,14 @@ package game
 
 import (
 	"fmt"
-	"image/color"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/vector"
-
 	"juanantoniocid/snake/internal/apple"
-	"juanantoniocid/snake/internal/position"
+	"juanantoniocid/snake/internal/direction"
+	"juanantoniocid/snake/internal/snake"
 )
 
 const (
@@ -22,17 +20,9 @@ const (
 	yGridCountInScreen = ScreenHeight / gridSize
 )
 
-const (
-	dirNone = iota
-	dirLeft
-	dirRight
-	dirDown
-	dirUp
-)
-
 type Game struct {
 	moveDirection int
-	snakeBody     []position.Position
+	snake         *snake.Snake
 	apple         *apple.Apple
 	timer         int
 	moveTime      int
@@ -43,14 +33,17 @@ type Game struct {
 
 func (g *Game) collidesWithApple() bool {
 	applePos := g.apple.GetPosition()
-	return g.snakeBody[0].X == applePos.X &&
-		g.snakeBody[0].Y == applePos.Y
+	snakePos := g.snake.GetHead()
+	return snakePos.X == applePos.X &&
+		snakePos.Y == applePos.Y
 }
 
 func (g *Game) collidesWithSelf() bool {
-	for _, v := range g.snakeBody[1:] {
-		if g.snakeBody[0].X == v.X &&
-			g.snakeBody[0].Y == v.Y {
+	head := g.snake.GetHead()
+	tail := g.snake.GetTail()
+	for _, v := range tail {
+		if head.X == v.X &&
+			head.Y == v.Y {
 			return true
 		}
 	}
@@ -58,10 +51,11 @@ func (g *Game) collidesWithSelf() bool {
 }
 
 func (g *Game) collidesWithWall() bool {
-	return g.snakeBody[0].X < 0 ||
-		g.snakeBody[0].Y < 0 ||
-		g.snakeBody[0].X >= xGridCountInScreen ||
-		g.snakeBody[0].Y >= yGridCountInScreen
+	head := g.snake.GetHead()
+	return head.X < 0 ||
+		head.Y < 0 ||
+		head.X >= xGridCountInScreen ||
+		head.Y >= yGridCountInScreen
 }
 
 func (g *Game) needsToMoveSnake() bool {
@@ -69,32 +63,31 @@ func (g *Game) needsToMoveSnake() bool {
 }
 
 func (g *Game) reset() {
-	g.setNewApple()
+	g.initApple()
+	g.initSnake()
+
 	g.moveTime = 4
-	g.snakeBody = g.snakeBody[:1]
-	g.snakeBody[0].X = xGridCountInScreen / 2
-	g.snakeBody[0].Y = yGridCountInScreen / 2
 	g.score = 0
 	g.level = 1
-	g.moveDirection = dirNone
+	g.moveDirection = direction.DirNone
 }
 
 func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		if g.moveDirection != dirRight {
-			g.moveDirection = dirLeft
+		if g.moveDirection != direction.DirRight {
+			g.moveDirection = direction.DirLeft
 		}
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		if g.moveDirection != dirLeft {
-			g.moveDirection = dirRight
+		if g.moveDirection != direction.DirLeft {
+			g.moveDirection = direction.DirRight
 		}
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		if g.moveDirection != dirUp {
-			g.moveDirection = dirDown
+		if g.moveDirection != direction.DirUp {
+			g.moveDirection = direction.DirDown
 		}
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) {
-		if g.moveDirection != dirDown {
-			g.moveDirection = dirUp
+		if g.moveDirection != direction.DirDown {
+			g.moveDirection = direction.DirUp
 		}
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		g.reset()
@@ -106,15 +99,12 @@ func (g *Game) Update() error {
 		}
 
 		if g.collidesWithApple() {
-			g.setNewApple()
-			g.snakeBody = append(g.snakeBody, position.Position{
-				X: g.snakeBody[len(g.snakeBody)-1].X,
-				Y: g.snakeBody[len(g.snakeBody)-1].Y,
-			})
-			if len(g.snakeBody) > 10 && len(g.snakeBody) < 20 {
+			g.initApple()
+			g.snake.Grow()
+			if g.snake.Len() > 10 && g.snake.Len() < 20 {
 				g.level = 2
 				g.moveTime = 3
-			} else if len(g.snakeBody) > 20 {
+			} else if g.snake.Len() > 20 {
 				g.level = 3
 				g.moveTime = 2
 			} else {
@@ -126,20 +116,7 @@ func (g *Game) Update() error {
 			}
 		}
 
-		for i := int64(len(g.snakeBody)) - 1; i > 0; i-- {
-			g.snakeBody[i].X = g.snakeBody[i-1].X
-			g.snakeBody[i].Y = g.snakeBody[i-1].Y
-		}
-		switch g.moveDirection {
-		case dirLeft:
-			g.snakeBody[0].X--
-		case dirRight:
-			g.snakeBody[0].X++
-		case dirDown:
-			g.snakeBody[0].Y++
-		case dirUp:
-			g.snakeBody[0].Y--
-		}
+		g.snake.Move(g.moveDirection)
 	}
 
 	g.timer++
@@ -147,18 +124,19 @@ func (g *Game) Update() error {
 	return nil
 }
 
-func (g *Game) setNewApple() {
+func (g *Game) initApple() {
 	g.apple = apple.NewApple(rand.Intn(xGridCountInScreen-1), rand.Intn(yGridCountInScreen-1), gridSize)
 }
 
-func (g *Game) Draw(screen *ebiten.Image) {
-	for _, v := range g.snakeBody {
-		vector.DrawFilledRect(screen, float32(v.X*gridSize), float32(v.Y*gridSize), gridSize, gridSize, color.RGBA{R: 0x80, G: 0xa0, B: 0xc0, A: 0xff}, false)
-	}
+func (g *Game) initSnake() {
+	g.snake = snake.NewSnake(xGridCountInScreen/2, yGridCountInScreen/2, gridSize)
+}
 
+func (g *Game) Draw(screen *ebiten.Image) {
+	g.snake.Draw(screen)
 	g.apple.Draw(screen)
 
-	if g.moveDirection == dirNone {
+	if g.moveDirection == direction.DirNone {
 		ebitenutil.DebugPrint(screen, "Press up/down/left/right to start")
 	} else {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f Level: %d Score: %d Best Score: %d", ebiten.ActualFPS(), g.level, g.score, g.bestScore))
@@ -171,11 +149,9 @@ func (g *Game) Layout(_, _ int) (int, int) {
 
 func NewGame() *Game {
 	g := &Game{
-		moveTime:  4,
-		snakeBody: make([]position.Position, 1),
+		moveTime: 4,
 	}
-	g.snakeBody[0].X = xGridCountInScreen / 2
-	g.snakeBody[0].Y = yGridCountInScreen / 2
-	g.setNewApple()
+	g.initApple()
+	g.initSnake()
 	return g
 }
