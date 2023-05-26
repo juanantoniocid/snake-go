@@ -78,7 +78,7 @@ func (g *Game) drawApple(screen *ebiten.Image) {
 }
 
 func (g *Game) drawSnake(screen *ebiten.Image) {
-	snake := g.play.Snake.GetBody()
+	snake := g.play.GetSnakeShape()
 	for _, v := range snake {
 		vector.DrawFilledRect(
 			screen,

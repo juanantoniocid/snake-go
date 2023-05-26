@@ -6,7 +6,7 @@ import (
 
 // Snake represents a snake
 type Snake struct {
-	body []geometry.Position
+	body geometry.Shape
 }
 
 // Move moves the snake
@@ -45,7 +45,7 @@ func (s *Snake) GetTail() []geometry.Position {
 	return s.body[1:]
 }
 
-func (s *Snake) GetBody() []geometry.Position {
+func (s *Snake) GetShape() geometry.Shape {
 	return s.body
 }
 
