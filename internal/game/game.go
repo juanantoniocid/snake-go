@@ -10,9 +10,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 
-	"juanantoniocid/snake/internal/apple"
 	"juanantoniocid/snake/internal/direction"
-	"juanantoniocid/snake/internal/snake"
+	"juanantoniocid/snake/internal/play/characters"
 )
 
 const (
@@ -25,8 +24,8 @@ const (
 
 type Game struct {
 	moveDirection int
-	snake         *snake.Snake
-	apple         *apple.Apple
+	snake         *characters.Snake
+	apple         *characters.Apple
 	timer         int
 	moveTime      int
 	score         int
@@ -128,11 +127,11 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) initApple() {
-	g.apple = apple.NewApple(rand.Intn(xGridCountInScreen-1), rand.Intn(yGridCountInScreen-1))
+	g.apple = characters.NewApple(rand.Intn(xGridCountInScreen-1), rand.Intn(yGridCountInScreen-1))
 }
 
 func (g *Game) initSnake() {
-	g.snake = snake.NewSnake(xGridCountInScreen/2, yGridCountInScreen/2)
+	g.snake = characters.NewSnake(xGridCountInScreen/2, yGridCountInScreen/2)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {

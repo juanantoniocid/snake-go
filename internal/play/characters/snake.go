@@ -1,4 +1,4 @@
-package snake
+package characters
 
 import (
 	"juanantoniocid/snake/internal/direction"

@@ -1,4 +1,4 @@
-package apple
+package characters
 
 import (
 	"juanantoniocid/snake/internal/position"
