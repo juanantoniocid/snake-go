@@ -6,6 +6,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"juanantoniocid/snake/internal/play"
 
@@ -23,7 +24,21 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	return g.play.Update()
+	dir := direction.DirNone
+
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		dir = direction.DirUp
+	} else if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		dir = direction.DirDown
+	} else if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		dir = direction.DirLeft
+	} else if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		dir = direction.DirRight
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		g.play.Reset()
+	}
+
+	return g.play.MoveSnake(dir)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {

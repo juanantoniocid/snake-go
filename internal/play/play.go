@@ -3,8 +3,6 @@ package play
 import (
 	"math/rand"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"juanantoniocid/snake/internal/direction"
 	"juanantoniocid/snake/internal/play/characters"
 )
@@ -56,7 +54,7 @@ func (p *Play) needsToMoveSnake() bool {
 	return p.timer%p.moveTime == 0
 }
 
-func (p *Play) reset() {
+func (p *Play) Reset() {
 	p.initApple()
 	p.initSnake()
 
@@ -66,30 +64,28 @@ func (p *Play) reset() {
 	p.MoveDirection = direction.DirNone
 }
 
-func (p *Play) Update() error {
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
+func (p *Play) MoveSnake(dir int) error {
+	if dir == direction.DirLeft {
 		if p.MoveDirection != direction.DirRight {
 			p.MoveDirection = direction.DirLeft
 		}
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
+	} else if dir == direction.DirRight {
 		if p.MoveDirection != direction.DirLeft {
 			p.MoveDirection = direction.DirRight
 		}
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) {
+	} else if dir == direction.DirDown {
 		if p.MoveDirection != direction.DirUp {
 			p.MoveDirection = direction.DirDown
 		}
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) {
+	} else if dir == direction.DirUp {
 		if p.MoveDirection != direction.DirDown {
 			p.MoveDirection = direction.DirUp
 		}
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		p.reset()
 	}
 
 	if p.needsToMoveSnake() {
 		if p.collidesWithWall() || p.collidesWithSelf() {
-			p.reset()
+			p.Reset()
 		}
 
 		if p.collidesWithApple() {
