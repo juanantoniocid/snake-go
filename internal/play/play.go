@@ -7,33 +7,49 @@ import (
 	"juanantoniocid/snake/internal/play/characters"
 )
 
+type Status int
+
+const (
+	StatusInitial Status = iota
+	StatusPlaying
+	StatusGameOver
+)
+
 type Play struct {
 	boardWidth  int
 	boardHeight int
 
-	MoveDirection int
-	Snake         *characters.Snake
-	Apple         *characters.Apple
+	Snake *characters.Snake
+	Apple *characters.Apple
 
-	timer    int
-	moveTime int
-
-	Score     int
-	BestScore int
-	Level     int
+	status        Status
+	timer         int
+	moveDirection int
+	moveTime      int
+	score         int
+	level         int
 }
 
 func NewPlay(width, height int) *Play {
 	g := &Play{
 		boardWidth:  width,
 		boardHeight: height,
-		moveTime:    4,
 	}
-
-	g.initApple()
-	g.initSnake()
+	g.Reset()
 
 	return g
+}
+
+func (p *Play) Reset() {
+	p.initApple()
+	p.initSnake()
+
+	p.status = StatusInitial
+	p.timer = 0
+	p.moveDirection = direction.DirNone
+	p.moveTime = 4
+	p.score = 0
+	p.level = 1
 }
 
 func (p *Play) initApple() {
@@ -42,6 +58,10 @@ func (p *Play) initApple() {
 
 func (p *Play) initSnake() {
 	p.Snake = characters.NewSnake(p.boardWidth/2, p.boardHeight/2)
+}
+
+func (p *Play) GetStatus() Status {
+	return p.status
 }
 
 func (p *Play) MoveSnake(dir int) error {
@@ -54,20 +74,20 @@ func (p *Play) MoveSnake(dir int) error {
 
 func (p *Play) setSnakeDirection(dir int) {
 	if dir == direction.DirLeft {
-		if p.MoveDirection != direction.DirRight {
-			p.MoveDirection = direction.DirLeft
+		if p.moveDirection != direction.DirRight {
+			p.moveDirection = direction.DirLeft
 		}
 	} else if dir == direction.DirRight {
-		if p.MoveDirection != direction.DirLeft {
-			p.MoveDirection = direction.DirRight
+		if p.moveDirection != direction.DirLeft {
+			p.moveDirection = direction.DirRight
 		}
 	} else if dir == direction.DirDown {
-		if p.MoveDirection != direction.DirUp {
-			p.MoveDirection = direction.DirDown
+		if p.moveDirection != direction.DirUp {
+			p.moveDirection = direction.DirDown
 		}
 	} else if dir == direction.DirUp {
-		if p.MoveDirection != direction.DirDown {
-			p.MoveDirection = direction.DirUp
+		if p.moveDirection != direction.DirDown {
+			p.moveDirection = direction.DirUp
 		}
 	}
 }
@@ -82,21 +102,18 @@ func (p *Play) moveSnake() {
 			p.initApple()
 			p.Snake.Grow()
 			if p.Snake.Len() > 10 && p.Snake.Len() < 20 {
-				p.Level = 2
+				p.level = 2
 				p.moveTime = 3
 			} else if p.Snake.Len() > 20 {
-				p.Level = 3
+				p.level = 3
 				p.moveTime = 2
 			} else {
-				p.Level = 1
+				p.level = 1
 			}
-			p.Score++
-			if p.BestScore < p.Score {
-				p.BestScore = p.Score
-			}
+			p.score++
 		}
 
-		p.Snake.Move(p.MoveDirection)
+		p.Snake.Move(p.moveDirection)
 	}
 }
 
@@ -131,12 +148,10 @@ func (p *Play) needsToMoveSnake() bool {
 	return p.timer%p.moveTime == 0
 }
 
-func (p *Play) Reset() {
-	p.initApple()
-	p.initSnake()
+func (p *Play) GetScore() int {
+	return p.score
+}
 
-	p.moveTime = 4
-	p.Score = 0
-	p.Level = 1
-	p.MoveDirection = direction.DirNone
+func (p *Play) GetLevel() int {
+	return p.level
 }

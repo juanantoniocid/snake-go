@@ -21,6 +21,8 @@ const (
 
 type Game struct {
 	play *play.Play
+
+	bestScore int
 }
 
 func (g *Game) Update() error {
@@ -38,17 +40,27 @@ func (g *Game) Update() error {
 		g.play.Reset()
 	}
 
-	return g.play.MoveSnake(dir)
+	err := g.play.MoveSnake(dir)
+
+	if err != nil {
+		return err
+	}
+
+	if g.bestScore < g.play.GetScore() {
+		g.bestScore = g.play.GetScore()
+	}
+
+	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.drawSnake(screen)
 	g.drawApple(screen)
 
-	if g.play.MoveDirection == direction.DirNone {
+	if g.play.GetStatus() == play.StatusInitial {
 		ebitenutil.DebugPrint(screen, "Press up/down/left/right to start")
 	} else {
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f Level: %d Score: %d Best Score: %d", ebiten.ActualFPS(), g.play.Level, g.play.Score, g.play.BestScore))
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f Level: %d Score: %d Best Score: %d", ebiten.ActualFPS(), g.play.GetLevel(), g.play.GetScore(), g.bestScore))
 	}
 }
 
