@@ -23,48 +23,36 @@ type Play struct {
 	Level     int
 }
 
-func (p *Play) collidesWithApple() bool {
-	applePos := p.Apple.GetPosition()
-	snakePos := p.Snake.GetHead()
-	return snakePos.X == applePos.X &&
-		snakePos.Y == applePos.Y
-}
-
-func (p *Play) collidesWithSelf() bool {
-	head := p.Snake.GetHead()
-	tail := p.Snake.GetTail()
-	for _, v := range tail {
-		if head.X == v.X &&
-			head.Y == v.Y {
-			return true
-		}
+func NewPlay(width, height int) *Play {
+	g := &Play{
+		boardWidth:  width,
+		boardHeight: height,
+		moveTime:    4,
 	}
-	return false
+
+	g.initApple()
+	g.initSnake()
+
+	return g
 }
 
-func (p *Play) collidesWithWall() bool {
-	head := p.Snake.GetHead()
-	return head.X < 0 ||
-		head.Y < 0 ||
-		head.X >= p.boardWidth ||
-		head.Y >= p.boardHeight
+func (p *Play) initApple() {
+	p.Apple = characters.NewApple(rand.Intn(p.boardWidth-1), rand.Intn(p.boardHeight-1))
 }
 
-func (p *Play) needsToMoveSnake() bool {
-	return p.timer%p.moveTime == 0
-}
-
-func (p *Play) Reset() {
-	p.initApple()
-	p.initSnake()
-
-	p.moveTime = 4
-	p.Score = 0
-	p.Level = 1
-	p.MoveDirection = direction.DirNone
+func (p *Play) initSnake() {
+	p.Snake = characters.NewSnake(p.boardWidth/2, p.boardHeight/2)
 }
 
 func (p *Play) MoveSnake(dir int) error {
+	p.setSnakeDirection(dir)
+	p.moveSnake()
+	p.timer++
+
+	return nil
+}
+
+func (p *Play) setSnakeDirection(dir int) {
 	if dir == direction.DirLeft {
 		if p.MoveDirection != direction.DirRight {
 			p.MoveDirection = direction.DirLeft
@@ -82,13 +70,15 @@ func (p *Play) MoveSnake(dir int) error {
 			p.MoveDirection = direction.DirUp
 		}
 	}
+}
 
+func (p *Play) moveSnake() {
 	if p.needsToMoveSnake() {
-		if p.collidesWithWall() || p.collidesWithSelf() {
+		if p.snakeCollidesWithWall() || p.snakeCollidesWithSelf() {
 			p.Reset()
 		}
 
-		if p.collidesWithApple() {
+		if p.snakeCollidesWithApple() {
 			p.initApple()
 			p.Snake.Grow()
 			if p.Snake.Len() > 10 && p.Snake.Len() < 20 {
@@ -108,27 +98,45 @@ func (p *Play) MoveSnake(dir int) error {
 
 		p.Snake.Move(p.MoveDirection)
 	}
-
-	p.timer++
-
-	return nil
 }
 
-func (p *Play) initApple() {
-	p.Apple = characters.NewApple(rand.Intn(p.boardWidth-1), rand.Intn(p.boardHeight-1))
+func (p *Play) snakeCollidesWithApple() bool {
+	applePos := p.Apple.GetPosition()
+	snakePos := p.Snake.GetHead()
+	return snakePos.X == applePos.X &&
+		snakePos.Y == applePos.Y
 }
 
-func (p *Play) initSnake() {
-	p.Snake = characters.NewSnake(p.boardWidth/2, p.boardHeight/2)
-}
-
-func NewPlay(width, height int) *Play {
-	g := &Play{
-		boardWidth:  width,
-		boardHeight: height,
-		moveTime:    4,
+func (p *Play) snakeCollidesWithSelf() bool {
+	head := p.Snake.GetHead()
+	tail := p.Snake.GetTail()
+	for _, v := range tail {
+		if head.X == v.X &&
+			head.Y == v.Y {
+			return true
+		}
 	}
-	g.initApple()
-	g.initSnake()
-	return g
+	return false
+}
+
+func (p *Play) snakeCollidesWithWall() bool {
+	head := p.Snake.GetHead()
+	return head.X < 0 ||
+		head.Y < 0 ||
+		head.X >= p.boardWidth ||
+		head.Y >= p.boardHeight
+}
+
+func (p *Play) needsToMoveSnake() bool {
+	return p.timer%p.moveTime == 0
+}
+
+func (p *Play) Reset() {
+	p.initApple()
+	p.initSnake()
+
+	p.moveTime = 4
+	p.Score = 0
+	p.Level = 1
+	p.MoveDirection = direction.DirNone
 }
