@@ -1,9 +1,9 @@
 package play
 
 import (
-	"juanantoniocid/snake/internal/geometry"
 	"math/rand"
 
+	"juanantoniocid/snake/internal/geometry"
 	"juanantoniocid/snake/internal/play/characters"
 )
 
@@ -15,6 +15,7 @@ const (
 	StatusGameOver
 )
 
+// Play is the main game struct
 type Play struct {
 	boardWidth  int
 	boardHeight int
@@ -30,6 +31,7 @@ type Play struct {
 	level         int
 }
 
+// NewPlay creates a new game
 func NewPlay(width, height int) *Play {
 	g := &Play{
 		boardWidth:  width,
@@ -40,6 +42,7 @@ func NewPlay(width, height int) *Play {
 	return g
 }
 
+// Reset resets the game
 func (p *Play) Reset() {
 	p.initApple()
 	p.initSnake()
@@ -60,26 +63,32 @@ func (p *Play) initSnake() {
 	p.snake = characters.NewSnake(p.boardWidth/2, p.boardHeight/2)
 }
 
+// GetStatus returns the current game status
 func (p *Play) GetStatus() Status {
 	return p.status
 }
 
+// GetScore returns the current game score
 func (p *Play) GetScore() int {
 	return p.score
 }
 
+// GetLevel returns the current game level
 func (p *Play) GetLevel() int {
 	return p.level
 }
 
+// GetSnakeShape returns the current snake shape
 func (p *Play) GetSnakeShape() geometry.Shape {
 	return p.snake.GetShape()
 }
 
+// GetAppleShape returns the current apple shape
 func (p *Play) GetAppleShape() geometry.Shape {
 	return p.apple.GetShape()
 }
 
+// MoveSnake moves the snake in the given direction
 func (p *Play) MoveSnake(dir geometry.Direction) error {
 	p.setSnakeDirection(dir)
 	p.moveSnake()
@@ -133,31 +142,32 @@ func (p *Play) moveSnake() {
 	}
 }
 
-func (p *Play) snakeCollidesWithApple() bool {
-	applePos := p.apple.GetShape()[0]
-	snakePos := p.snake.GetHead()
-	return snakePos.X == applePos.X &&
-		snakePos.Y == applePos.Y
+func (p *Play) snakeCollidesWithWall() bool {
+	snakeHead := p.snake.GetShape()[0]
+	return snakeHead.X < 0 ||
+		snakeHead.Y < 0 ||
+		snakeHead.X >= p.boardWidth ||
+		snakeHead.Y >= p.boardHeight
 }
 
 func (p *Play) snakeCollidesWithSelf() bool {
-	head := p.snake.GetHead()
-	tail := p.snake.GetTail()
-	for _, v := range tail {
-		if head.X == v.X &&
-			head.Y == v.Y {
+	snakeShape := p.snake.GetShape()
+	snakeHead := snakeShape[0]
+	snakeTail := snakeShape[1:]
+	for _, v := range snakeTail {
+		if snakeHead.X == v.X &&
+			snakeHead.Y == v.Y {
 			return true
 		}
 	}
 	return false
 }
 
-func (p *Play) snakeCollidesWithWall() bool {
-	head := p.snake.GetHead()
-	return head.X < 0 ||
-		head.Y < 0 ||
-		head.X >= p.boardWidth ||
-		head.Y >= p.boardHeight
+func (p *Play) snakeCollidesWithApple() bool {
+	appleShape := p.apple.GetShape()[0]
+	snakeHead := p.snake.GetShape()[0]
+	return snakeHead.X == appleShape.X &&
+		snakeHead.Y == appleShape.Y
 }
 
 func (p *Play) needsToMoveSnake() bool {

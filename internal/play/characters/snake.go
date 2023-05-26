@@ -35,20 +35,12 @@ func (s *Snake) Grow() {
 	s.body = append(s.body, tail)
 }
 
-// GetHead returns the snake head
-func (s *Snake) GetHead() geometry.Position {
-	return s.body[0]
-}
-
-// GetTail returns the snake tail
-func (s *Snake) GetTail() []geometry.Position {
-	return s.body[1:]
-}
-
+// GetShape returns the shape of the snake
 func (s *Snake) GetShape() geometry.Shape {
 	return s.body
 }
 
+// Len returns the length of the snake
 func (s *Snake) Len() int {
 	return len(s.body)
 }
