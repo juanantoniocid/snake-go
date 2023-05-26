@@ -25,22 +25,7 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	dir := geometry.DirNone
-
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		dir = geometry.DirUp
-	} else if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		dir = geometry.DirDown
-	} else if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		dir = geometry.DirLeft
-	} else if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		dir = geometry.DirRight
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		g.play.Reset()
-	}
-
-	err := g.play.MoveSnake(dir)
-
+	err := g.iterate()
 	if err != nil {
 		return err
 	}
@@ -50,6 +35,25 @@ func (g *Game) Update() error {
 	}
 
 	return nil
+}
+
+func (g *Game) iterate() error {
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		g.play.Reset()
+		return nil
+	}
+
+	dir := geometry.DirNone
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		dir = geometry.DirUp
+	} else if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		dir = geometry.DirDown
+	} else if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		dir = geometry.DirLeft
+	} else if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		dir = geometry.DirRight
+	}
+	return g.play.MoveSnake(dir)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
