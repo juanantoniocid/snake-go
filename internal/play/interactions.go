@@ -2,6 +2,13 @@ package play
 
 import "juanantoniocid/snake/internal/geometry"
 
+// MoveSnake moves the snake in the given direction
+func (p *Play) MoveSnake(dir geometry.Direction) {
+	p.setSnakeDirection(dir)
+	p.moveSnake()
+	p.timer++
+}
+
 func (p *Play) setSnakeDirection(dir geometry.Direction) {
 	if dir == geometry.DirLeft {
 		if p.moveDirection != geometry.DirRight {

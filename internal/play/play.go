@@ -87,10 +87,3 @@ func (p *Play) GetSnakeShape() geometry.Shape {
 func (p *Play) GetAppleShape() geometry.Shape {
 	return p.apple.GetShape()
 }
-
-// MoveSnake moves the snake in the given direction
-func (p *Play) MoveSnake(dir geometry.Direction) {
-	p.setSnakeDirection(dir)
-	p.moveSnake()
-	p.timer++
-}
