@@ -3,12 +3,13 @@ package game
 import (
 	"fmt"
 	"image/color"
-	"juanantoniocid/snake/internal/geometry"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+
+	"juanantoniocid/snake/internal/geometry"
 	"juanantoniocid/snake/internal/play"
 )
 
