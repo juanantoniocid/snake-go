@@ -26,22 +26,17 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	err := g.iterate()
-	if err != nil {
-		return err
-	}
-
+	g.iterate()
 	if g.bestScore < g.play.GetScore() {
 		g.bestScore = g.play.GetScore()
 	}
-
 	return nil
 }
 
-func (g *Game) iterate() error {
+func (g *Game) iterate() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		g.play.Reset()
-		return nil
+		return
 	}
 
 	dir := geometry.DirNone
@@ -54,7 +49,7 @@ func (g *Game) iterate() error {
 	} else if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		dir = geometry.DirRight
 	}
-	return g.play.MoveSnake(dir)
+	g.play.MoveSnake(dir)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
