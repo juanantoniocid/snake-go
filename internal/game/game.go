@@ -3,14 +3,13 @@ package game
 import (
 	"fmt"
 	"image/color"
+	"juanantoniocid/snake/internal/geometry"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"juanantoniocid/snake/internal/play"
-
-	"juanantoniocid/snake/internal/direction"
 )
 
 const (
@@ -26,16 +25,16 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	dir := direction.DirNone
+	dir := geometry.DirNone
 
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		dir = direction.DirUp
+		dir = geometry.DirUp
 	} else if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		dir = direction.DirDown
+		dir = geometry.DirDown
 	} else if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		dir = direction.DirLeft
+		dir = geometry.DirLeft
 	} else if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		dir = direction.DirRight
+		dir = geometry.DirRight
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		g.play.Reset()
 	}

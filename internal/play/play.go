@@ -1,9 +1,9 @@
 package play
 
 import (
+	"juanantoniocid/snake/internal/geometry"
 	"math/rand"
 
-	"juanantoniocid/snake/internal/direction"
 	"juanantoniocid/snake/internal/play/characters"
 )
 
@@ -24,7 +24,7 @@ type Play struct {
 
 	status        Status
 	timer         int
-	moveDirection int
+	moveDirection geometry.Direction
 	moveTime      int
 	score         int
 	level         int
@@ -46,7 +46,7 @@ func (p *Play) Reset() {
 
 	p.status = StatusInitial
 	p.timer = 0
-	p.moveDirection = direction.DirNone
+	p.moveDirection = geometry.DirNone
 	p.moveTime = 4
 	p.score = 0
 	p.level = 1
@@ -64,7 +64,7 @@ func (p *Play) GetStatus() Status {
 	return p.status
 }
 
-func (p *Play) MoveSnake(dir int) error {
+func (p *Play) MoveSnake(dir geometry.Direction) error {
 	p.setSnakeDirection(dir)
 	p.moveSnake()
 	p.timer++
@@ -72,22 +72,22 @@ func (p *Play) MoveSnake(dir int) error {
 	return nil
 }
 
-func (p *Play) setSnakeDirection(dir int) {
-	if dir == direction.DirLeft {
-		if p.moveDirection != direction.DirRight {
-			p.moveDirection = direction.DirLeft
+func (p *Play) setSnakeDirection(dir geometry.Direction) {
+	if dir == geometry.DirLeft {
+		if p.moveDirection != geometry.DirRight {
+			p.moveDirection = geometry.DirLeft
 		}
-	} else if dir == direction.DirRight {
-		if p.moveDirection != direction.DirLeft {
-			p.moveDirection = direction.DirRight
+	} else if dir == geometry.DirRight {
+		if p.moveDirection != geometry.DirLeft {
+			p.moveDirection = geometry.DirRight
 		}
-	} else if dir == direction.DirDown {
-		if p.moveDirection != direction.DirUp {
-			p.moveDirection = direction.DirDown
+	} else if dir == geometry.DirDown {
+		if p.moveDirection != geometry.DirUp {
+			p.moveDirection = geometry.DirDown
 		}
-	} else if dir == direction.DirUp {
-		if p.moveDirection != direction.DirDown {
-			p.moveDirection = direction.DirUp
+	} else if dir == geometry.DirUp {
+		if p.moveDirection != geometry.DirDown {
+			p.moveDirection = geometry.DirUp
 		}
 	}
 }

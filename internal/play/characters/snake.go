@@ -1,17 +1,16 @@
 package characters
 
 import (
-	"juanantoniocid/snake/internal/direction"
-	"juanantoniocid/snake/internal/position"
+	"juanantoniocid/snake/internal/geometry"
 )
 
 // Snake represents a snake
 type Snake struct {
-	body []position.Position
+	body []geometry.Position
 }
 
 // Move moves the snake
-func (s *Snake) Move(dir int) {
+func (s *Snake) Move(dir geometry.Direction) {
 	for i := int64(len(s.body)) - 1; i > 0; i-- {
 		s.body[i].X = s.body[i-1].X
 		s.body[i].Y = s.body[i-1].Y
@@ -19,13 +18,13 @@ func (s *Snake) Move(dir int) {
 
 	head := &s.body[0]
 	switch dir {
-	case direction.DirLeft:
+	case geometry.DirLeft:
 		head.X--
-	case direction.DirRight:
+	case geometry.DirRight:
 		head.X++
-	case direction.DirDown:
+	case geometry.DirDown:
 		head.Y++
-	case direction.DirUp:
+	case geometry.DirUp:
 		head.Y--
 	}
 }
@@ -37,16 +36,16 @@ func (s *Snake) Grow() {
 }
 
 // GetHead returns the snake head
-func (s *Snake) GetHead() position.Position {
+func (s *Snake) GetHead() geometry.Position {
 	return s.body[0]
 }
 
 // GetTail returns the snake tail
-func (s *Snake) GetTail() []position.Position {
+func (s *Snake) GetTail() []geometry.Position {
 	return s.body[1:]
 }
 
-func (s *Snake) GetBody() []position.Position {
+func (s *Snake) GetBody() []geometry.Position {
 	return s.body
 }
 
@@ -57,7 +56,7 @@ func (s *Snake) Len() int {
 // NewSnake creates a new snake
 func NewSnake(posX, posY int) *Snake {
 	return &Snake{
-		body: []position.Position{
+		body: []geometry.Position{
 			{X: posX, Y: posY},
 		},
 	}

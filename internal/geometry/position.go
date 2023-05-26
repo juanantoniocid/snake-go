@@ -1,4 +1,4 @@
-package position
+package geometry
 
 type Position struct {
 	X int
