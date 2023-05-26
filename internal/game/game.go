@@ -2,11 +2,14 @@ package game
 
 import (
 	"fmt"
+	"image/color"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/vector"
+
 	"juanantoniocid/snake/internal/apple"
 	"juanantoniocid/snake/internal/direction"
 	"juanantoniocid/snake/internal/snake"
@@ -125,21 +128,50 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) initApple() {
-	g.apple = apple.NewApple(rand.Intn(xGridCountInScreen-1), rand.Intn(yGridCountInScreen-1), gridSize)
+	g.apple = apple.NewApple(rand.Intn(xGridCountInScreen-1), rand.Intn(yGridCountInScreen-1))
 }
 
 func (g *Game) initSnake() {
-	g.snake = snake.NewSnake(xGridCountInScreen/2, yGridCountInScreen/2, gridSize)
+	g.snake = snake.NewSnake(xGridCountInScreen/2, yGridCountInScreen/2)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.snake.Draw(screen)
-	g.apple.Draw(screen)
+	g.drawSnake(screen)
+	g.drawApple(screen)
 
 	if g.moveDirection == direction.DirNone {
 		ebitenutil.DebugPrint(screen, "Press up/down/left/right to start")
 	} else {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f Level: %d Score: %d Best Score: %d", ebiten.ActualFPS(), g.level, g.score, g.bestScore))
+	}
+}
+
+func (g *Game) drawApple(screen *ebiten.Image) {
+	apple := g.apple.GetPosition()
+
+	vector.DrawFilledRect(
+		screen,
+		float32(apple.X*gridSize),
+		float32(apple.Y*gridSize),
+		float32(gridSize),
+		float32(gridSize),
+		color.RGBA{R: 0xFF, A: 0xff},
+		false,
+	)
+}
+
+func (g *Game) drawSnake(screen *ebiten.Image) {
+	snake := g.snake.GetBody()
+	for _, v := range snake {
+		vector.DrawFilledRect(
+			screen,
+			float32(v.X*gridSize),
+			float32(v.Y*gridSize),
+			float32(gridSize),
+			float32(gridSize),
+			color.RGBA{R: 0x80, G: 0xa0, B: 0xc0, A: 0xff},
+			false,
+		)
 	}
 }
 

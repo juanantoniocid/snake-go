@@ -1,11 +1,6 @@
 package snake
 
 import (
-	"image/color"
-
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
-
 	"juanantoniocid/snake/internal/direction"
 	"juanantoniocid/snake/internal/position"
 )
@@ -13,7 +8,6 @@ import (
 // Snake represents a snake
 type Snake struct {
 	body []position.Position
-	size int
 }
 
 // Move moves the snake
@@ -52,31 +46,19 @@ func (s *Snake) GetTail() []position.Position {
 	return s.body[1:]
 }
 
+func (s *Snake) GetBody() []position.Position {
+	return s.body
+}
+
 func (s *Snake) Len() int {
 	return len(s.body)
 }
 
-// Draw draws the snake
-func (s *Snake) Draw(screen *ebiten.Image) {
-	for _, v := range s.body {
-		vector.DrawFilledRect(
-			screen,
-			float32(v.X*s.size),
-			float32(v.Y*s.size),
-			float32(s.size),
-			float32(s.size),
-			color.RGBA{R: 0x80, G: 0xa0, B: 0xc0, A: 0xff},
-			false,
-		)
-	}
-}
-
 // NewSnake creates a new snake
-func NewSnake(posX, posY, size int) *Snake {
+func NewSnake(posX, posY int) *Snake {
 	return &Snake{
 		body: []position.Position{
 			{X: posX, Y: posY},
 		},
-		size: size,
 	}
 }
