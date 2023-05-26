@@ -6,17 +6,17 @@ import (
 
 // Apple represents an apple
 type Apple struct {
-	position geometry.Position
+	position geometry.Shape
 }
 
-// GetPosition returns the apple position
-func (a *Apple) GetPosition() geometry.Position {
+// GetShape returns the apple position
+func (a *Apple) GetShape() geometry.Shape {
 	return a.position
 }
 
 // NewApple creates a new apple
 func NewApple(posX, posY int) *Apple {
 	return &Apple{
-		position: geometry.Position{X: posX, Y: posY},
+		position: []geometry.Position{{X: posX, Y: posY}},
 	}
 }

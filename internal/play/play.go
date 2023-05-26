@@ -20,7 +20,7 @@ type Play struct {
 	boardHeight int
 
 	snake *characters.Snake
-	Apple *characters.Apple
+	apple *characters.Apple
 
 	status        Status
 	timer         int
@@ -53,7 +53,7 @@ func (p *Play) Reset() {
 }
 
 func (p *Play) initApple() {
-	p.Apple = characters.NewApple(rand.Intn(p.boardWidth-1), rand.Intn(p.boardHeight-1))
+	p.apple = characters.NewApple(rand.Intn(p.boardWidth-1), rand.Intn(p.boardHeight-1))
 }
 
 func (p *Play) initSnake() {
@@ -62,6 +62,22 @@ func (p *Play) initSnake() {
 
 func (p *Play) GetStatus() Status {
 	return p.status
+}
+
+func (p *Play) GetScore() int {
+	return p.score
+}
+
+func (p *Play) GetLevel() int {
+	return p.level
+}
+
+func (p *Play) GetSnakeShape() geometry.Shape {
+	return p.snake.GetShape()
+}
+
+func (p *Play) GetAppleShape() geometry.Shape {
+	return p.apple.GetShape()
 }
 
 func (p *Play) MoveSnake(dir geometry.Direction) error {
@@ -118,7 +134,7 @@ func (p *Play) moveSnake() {
 }
 
 func (p *Play) snakeCollidesWithApple() bool {
-	applePos := p.Apple.GetPosition()
+	applePos := p.apple.GetShape()[0]
 	snakePos := p.snake.GetHead()
 	return snakePos.X == applePos.X &&
 		snakePos.Y == applePos.Y
@@ -146,16 +162,4 @@ func (p *Play) snakeCollidesWithWall() bool {
 
 func (p *Play) needsToMoveSnake() bool {
 	return p.timer%p.moveTime == 0
-}
-
-func (p *Play) GetScore() int {
-	return p.score
-}
-
-func (p *Play) GetLevel() int {
-	return p.level
-}
-
-func (p *Play) GetSnakeShape() geometry.Shape {
-	return p.snake.GetShape()
 }

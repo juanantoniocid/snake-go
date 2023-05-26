@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	ScreenWidth  = 640
-	ScreenHeight = 480
-	gridSize     = 10
+	ScreenWidth          = 640
+	ScreenHeight         = 480
+	gridSize     float32 = 10
 )
 
 type Game struct {
@@ -64,31 +64,19 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) drawApple(screen *ebiten.Image) {
-	apple := g.play.Apple.GetPosition()
-
-	vector.DrawFilledRect(
-		screen,
-		float32(apple.X*gridSize),
-		float32(apple.Y*gridSize),
-		float32(gridSize),
-		float32(gridSize),
-		color.RGBA{R: 0xFF, A: 0xff},
-		false,
-	)
+	apple := g.play.GetAppleShape()
+	for _, a := range apple {
+		vector.DrawFilledRect(screen, float32(a.X)*gridSize, float32(a.Y)*gridSize, gridSize, gridSize,
+			color.RGBA{R: 0xFF, A: 0xff}, false)
+	}
 }
 
 func (g *Game) drawSnake(screen *ebiten.Image) {
 	snake := g.play.GetSnakeShape()
 	for _, v := range snake {
 		vector.DrawFilledRect(
-			screen,
-			float32(v.X*gridSize),
-			float32(v.Y*gridSize),
-			float32(gridSize),
-			float32(gridSize),
-			color.RGBA{R: 0x80, G: 0xa0, B: 0xc0, A: 0xff},
-			false,
-		)
+			screen, float32(v.X)*gridSize, float32(v.Y)*gridSize, gridSize, gridSize,
+			color.RGBA{R: 0x80, G: 0xa0, B: 0xc0, A: 0xff}, false)
 	}
 }
 
@@ -98,7 +86,7 @@ func (g *Game) Layout(_, _ int) (int, int) {
 
 func NewGame() *Game {
 	g := &Game{
-		play: play.NewPlay(ScreenWidth/gridSize, ScreenHeight/gridSize),
+		play: play.NewPlay(ScreenWidth/int(gridSize), ScreenHeight/int(gridSize)),
 	}
 
 	return g
