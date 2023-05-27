@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"image/color"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -34,12 +35,24 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) iterate() {
+	dir := geometry.DirNone
+
+	if g.play.GetStatus() == play.StatusGameOver {
+		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+			g.play.Reset()
+			dir = geometry.DirUp
+		}
+	}
+
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		g.play.Reset()
 		return
 	}
 
-	dir := geometry.DirNone
+	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
+		os.Exit(0)
+	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
 		dir = geometry.DirUp
 	} else if ebiten.IsKeyPressed(ebiten.KeyDown) {
@@ -56,10 +69,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.drawSnake(screen)
 	g.drawApple(screen)
 
-	if g.play.GetStatus() == play.StatusInitial {
-		ebitenutil.DebugPrint(screen, "Press up/down/left/right to start")
-	} else {
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f Level: %d Score: %d Best Score: %d", ebiten.ActualFPS(), g.play.GetLevel(), g.play.GetScore(), g.bestScore))
+	switch g.play.GetStatus() {
+	case play.StatusInitial:
+		ebitenutil.DebugPrint(screen, "Press up/down/left/right to start. Press escape to reset.")
+	case play.StatusPlaying:
+		ebitenutil.DebugPrint(screen, fmt.Sprintf(
+			"Level: %d Score: %d Best Score: %d.", g.play.GetLevel(), g.play.GetScore(), g.bestScore))
+	case play.StatusGameOver:
+		ebitenutil.DebugPrint(screen, "Game Over. Press enter to restart or Q to quit.")
 	}
 }
 

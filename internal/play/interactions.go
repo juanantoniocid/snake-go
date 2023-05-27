@@ -4,6 +4,14 @@ import "juanantoniocid/snake/internal/geometry"
 
 // MoveSnake moves the snake in the given direction
 func (p *Play) MoveSnake(dir geometry.Direction) {
+	if p.status == StatusGameOver {
+		return
+	}
+
+	if p.status == StatusInitial && dir != geometry.DirNone {
+		p.status = StatusPlaying
+	}
+
 	p.setSnakeDirection(dir)
 	p.moveSnake()
 	p.timer++
@@ -32,7 +40,7 @@ func (p *Play) setSnakeDirection(dir geometry.Direction) {
 func (p *Play) moveSnake() {
 	if p.needsToMoveSnake() {
 		if p.snakeCollidesWithWall() || p.snakeCollidesWithSelf() {
-			p.Reset()
+			p.status = StatusGameOver
 		}
 
 		if p.snakeEatsApple() {
