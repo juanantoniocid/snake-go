@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	ScreenWidth          = 640
-	ScreenHeight         = 480
-	gridSize     float32 = 10
+	width                  = 320
+	height                 = 200
+	gridSize       float32 = 4
+	sizeMultiplier         = 3
 )
 
 type Game struct {
@@ -71,12 +72,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	switch g.play.GetStatus() {
 	case play.StatusInitial:
-		ebitenutil.DebugPrint(screen, "Press up/down/left/right to start. Press escape to reset.")
+		ebitenutil.DebugPrint(screen, "Press any arrow key to start.")
 	case play.StatusPlaying:
 		ebitenutil.DebugPrint(screen, fmt.Sprintf(
-			"Level: %d Score: %d Best Score: %d.", g.play.GetLevel(), g.play.GetScore(), g.bestScore))
+			"Level %d : Score %d : Best Score : %d", g.play.GetLevel(), g.play.GetScore(), g.bestScore))
 	case play.StatusGameOver:
-		ebitenutil.DebugPrint(screen, "Game Over. Press enter to restart or Q to quit.")
+		ebitenutil.DebugPrint(screen, "Game Over. Enter to restart or Q to quit.")
 	}
 }
 
@@ -84,7 +85,7 @@ func (g *Game) drawApple(screen *ebiten.Image) {
 	apple := g.play.GetAppleShape()
 	for _, a := range apple {
 		vector.DrawFilledRect(screen, float32(a.X)*gridSize, float32(a.Y)*gridSize, gridSize, gridSize,
-			color.RGBA{R: 0xFF, A: 0xff}, false)
+			color.RGBA{R: 0xaa, A: 0xff}, false)
 	}
 }
 
@@ -93,18 +94,26 @@ func (g *Game) drawSnake(screen *ebiten.Image) {
 	for _, v := range snake {
 		vector.DrawFilledRect(
 			screen, float32(v.X)*gridSize, float32(v.Y)*gridSize, gridSize, gridSize,
-			color.RGBA{R: 0x80, G: 0xa0, B: 0xc0, A: 0xff}, false)
+			color.RGBA{G: 0xaa, A: 0xff}, false)
 	}
 }
 
 func (g *Game) Layout(_, _ int) (int, int) {
-	return ScreenWidth, ScreenHeight
+	return width, height
 }
 
 func NewGame() *Game {
 	g := &Game{
-		play: play.NewPlay(ScreenWidth/int(gridSize), ScreenHeight/int(gridSize)),
+		play: play.NewPlay(width/int(gridSize), height/int(gridSize)),
 	}
 
 	return g
+}
+
+func Run() {
+	ebiten.SetWindowSize(width*sizeMultiplier, height*sizeMultiplier)
+	ebiten.SetWindowTitle("Snake (Zippo Studios)")
+	if err := ebiten.RunGame(NewGame()); err != nil {
+		panic(err)
+	}
 }

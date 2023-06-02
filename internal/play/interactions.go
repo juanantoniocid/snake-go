@@ -84,13 +84,17 @@ func (p *Play) snakeEatsApple() bool {
 }
 
 func (p *Play) setLevel() {
-	if p.snake.Len() > 10 && p.snake.Len() < 20 {
+	if p.snake.Len() <= 10 {
+		p.level = 1
+		p.moveTime = 4
+	} else if p.snake.Len() <= 20 {
 		p.level = 2
 		p.moveTime = 3
-	} else if p.snake.Len() > 20 {
+	} else if p.snake.Len() <= 30 {
 		p.level = 3
 		p.moveTime = 2
 	} else {
-		p.level = 1
+		p.level = 4
+		p.moveTime = 1
 	}
 }
