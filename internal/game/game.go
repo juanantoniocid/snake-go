@@ -75,7 +75,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		ebitenutil.DebugPrint(screen, "Press any arrow key to start.")
 	case play.StatusPlaying:
 		ebitenutil.DebugPrint(screen, fmt.Sprintf(
-			"Level %d : Score %d : Best Score: %d", g.play.GetLevel(), g.play.GetScore(), g.bestScore))
+			"Level %d : Score %d : Best Score : %d", g.play.GetLevel(), g.play.GetScore(), g.bestScore))
 	case play.StatusGameOver:
 		ebitenutil.DebugPrint(screen, "Game Over. Enter to restart or Q to quit.")
 	}
