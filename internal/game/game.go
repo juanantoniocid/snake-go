@@ -17,7 +17,7 @@ import (
 const (
 	width                  = 320
 	height                 = 200
-	gridSize       float32 = 5
+	gridSize       float32 = 4
 	sizeMultiplier         = 3
 )
 
@@ -72,10 +72,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	switch g.play.GetStatus() {
 	case play.StatusInitial:
-		ebitenutil.DebugPrint(screen, "Arrow keys to start. Escape to reset.")
+		ebitenutil.DebugPrint(screen, "Press any arrow key to start.")
 	case play.StatusPlaying:
 		ebitenutil.DebugPrint(screen, fmt.Sprintf(
-			"Level: %d Score: %d Best Score: %d.", g.play.GetLevel(), g.play.GetScore(), g.bestScore))
+			"Level %d : Score %d : Best Score: %d", g.play.GetLevel(), g.play.GetScore(), g.bestScore))
 	case play.StatusGameOver:
 		ebitenutil.DebugPrint(screen, "Game Over. Enter to restart or Q to quit.")
 	}
