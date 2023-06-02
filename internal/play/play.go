@@ -26,8 +26,8 @@ type Play struct {
 	status        Status
 	timer         int
 	moveDirection geometry.Direction
-	moveTime      int
 	score         int
+	moveTime      int
 	level         int
 }
 
@@ -46,13 +46,12 @@ func NewPlay(width, height int) *Play {
 func (p *Play) Reset() {
 	p.initApple()
 	p.initSnake()
+	p.setLevel()
 
 	p.status = StatusInitial
 	p.timer = 0
 	p.moveDirection = geometry.DirNone
-	p.moveTime = 4
 	p.score = 0
-	p.level = 1
 }
 
 func (p *Play) initApple() {
