@@ -14,18 +14,18 @@ type board struct {
 	snake *characters.Snake
 	apple *characters.Apple
 
-	moveDirection geometry.Direction
-	timer         int
-	moveTime      int
+	direction geometry.Direction
+	speed     int
+	timer     int
 }
 
 func newBoard(width, height int) *board {
 	b := &board{
-		width:         width,
-		height:        height,
-		moveDirection: geometry.DirNone,
-		timer:         0,
-		moveTime:      4,
+		width:     width,
+		height:    height,
+		direction: geometry.DirNone,
+		speed:     4,
+		timer:     0,
 	}
 
 	b.initSnake()
@@ -36,33 +36,34 @@ func newBoard(width, height int) *board {
 
 func (b *board) MoveSnake(dir geometry.Direction) Status {
 	b.timer++
-	b.setSnakeDirection(dir)
-	return b.moveSnake()
+	return b.moveSnake(dir)
 }
 
-func (b *board) setSnakeDirection(dir geometry.Direction) {
+func (b *board) moveSnake(dir geometry.Direction) Status {
 	if dir == geometry.DirLeft {
-		if b.moveDirection != geometry.DirRight {
-			b.moveDirection = geometry.DirLeft
+		if b.direction != geometry.DirRight {
+			b.direction = geometry.DirLeft
 		}
 	} else if dir == geometry.DirRight {
-		if b.moveDirection != geometry.DirLeft {
-			b.moveDirection = geometry.DirRight
+		if b.direction != geometry.DirLeft {
+			b.direction = geometry.DirRight
 		}
 	} else if dir == geometry.DirDown {
-		if b.moveDirection != geometry.DirUp {
-			b.moveDirection = geometry.DirDown
+		if b.direction != geometry.DirUp {
+			b.direction = geometry.DirDown
 		}
 	} else if dir == geometry.DirUp {
-		if b.moveDirection != geometry.DirDown {
-			b.moveDirection = geometry.DirUp
+		if b.direction != geometry.DirDown {
+			b.direction = geometry.DirUp
 		}
 	}
+
+	return b.advanceSnake()
 }
 
-func (b *board) moveSnake() Status {
+func (b *board) advanceSnake() Status {
 	if b.needsToMoveSnake() {
-		b.snake.Move(b.moveDirection)
+		b.snake.Move(b.direction)
 
 		if b.snakeCollidesWithWall() || b.snakeCollidesWithSelf() {
 			return StatusGameOver
@@ -87,7 +88,7 @@ func (b *board) initSnake() {
 }
 
 func (b *board) needsToMoveSnake() bool {
-	return b.timer%b.moveTime == 0
+	return b.timer%b.speed == 0
 }
 
 func (b *board) snakeCollidesWithWall() bool {
@@ -116,7 +117,7 @@ func (b *board) snakeEatsApple() bool {
 }
 
 func (b *board) SetSpeed(speed int) {
-	b.moveTime = speed
+	b.speed = speed
 }
 
 func (b *board) GetSnake() *characters.Snake {
