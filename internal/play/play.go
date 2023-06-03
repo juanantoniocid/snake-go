@@ -29,8 +29,8 @@ func NewPlay(width, height int) *Play {
 
 		status: StatusInitial,
 		score:  0,
+		level:  1,
 	}
-	g.setLevel()
 
 	return g
 }
@@ -52,12 +52,12 @@ func (p *Play) GetLevel() int {
 
 // GetSnakeShape returns the current snake shape
 func (p *Play) GetSnakeShape() geometry.Shape {
-	return p.board.GetSnake().GetShape()
+	return p.board.GetSnakeShape()
 }
 
 // GetAppleShape returns the current apple shape
 func (p *Play) GetAppleShape() geometry.Shape {
-	return p.board.GetApple().GetShape()
+	return p.board.GetAppleShape()
 }
 
 // MoveSnake moves the snake in the given direction
@@ -67,21 +67,17 @@ func (p *Play) MoveSnake(dir geometry.Direction) {
 	}
 
 	p.status = p.board.MoveSnake(dir)
-	p.setLevel()
-
 	if p.status == StatusSnakeEating {
-		p.score++
+		p.increaseScore()
 		p.status = StatusPlaying
 		return
 	}
-
-	if p.status == StatusInitial && dir != geometry.DirNone {
-		p.status = StatusPlaying
-	}
 }
 
-func (p *Play) setLevel() {
+func (p *Play) increaseScore() {
 	var speed int
+	p.score++
+
 	if p.score < 10 {
 		p.level = 1
 		speed = 4

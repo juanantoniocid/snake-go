@@ -14,18 +14,18 @@ type board struct {
 	snake *characters.Snake
 	apple *characters.Apple
 
-	direction geometry.Direction
-	speed     int
-	timer     int
+	snakeDirection geometry.Direction
+	snakeSpeed     int
+	timer          int
 }
 
 func newBoard(width, height int) *board {
 	b := &board{
-		width:     width,
-		height:    height,
-		direction: geometry.DirNone,
-		speed:     4,
-		timer:     0,
+		width:          width,
+		height:         height,
+		snakeDirection: geometry.DirNone,
+		snakeSpeed:     4,
+		timer:          0,
 	}
 
 	b.initSnake()
@@ -34,6 +34,22 @@ func newBoard(width, height int) *board {
 	return b
 }
 
+// GetSnakeShape returns the snake shape
+func (b *board) GetSnakeShape() geometry.Shape {
+	return b.snake.GetShape()
+}
+
+// GetAppleShape returns the apple shape
+func (b *board) GetAppleShape() geometry.Shape {
+	return b.apple.GetShape()
+}
+
+// SetSpeed sets the speed of the snake
+func (b *board) SetSpeed(speed int) {
+	b.snakeSpeed = speed
+}
+
+// MoveSnake moves the snake in the given direction
 func (b *board) MoveSnake(dir geometry.Direction) Status {
 	b.timer++
 	return b.moveSnake(dir)
@@ -41,20 +57,20 @@ func (b *board) MoveSnake(dir geometry.Direction) Status {
 
 func (b *board) moveSnake(dir geometry.Direction) Status {
 	if dir == geometry.DirLeft {
-		if b.direction != geometry.DirRight {
-			b.direction = geometry.DirLeft
+		if b.snakeDirection != geometry.DirRight {
+			b.snakeDirection = geometry.DirLeft
 		}
 	} else if dir == geometry.DirRight {
-		if b.direction != geometry.DirLeft {
-			b.direction = geometry.DirRight
+		if b.snakeDirection != geometry.DirLeft {
+			b.snakeDirection = geometry.DirRight
 		}
 	} else if dir == geometry.DirDown {
-		if b.direction != geometry.DirUp {
-			b.direction = geometry.DirDown
+		if b.snakeDirection != geometry.DirUp {
+			b.snakeDirection = geometry.DirDown
 		}
 	} else if dir == geometry.DirUp {
-		if b.direction != geometry.DirDown {
-			b.direction = geometry.DirUp
+		if b.snakeDirection != geometry.DirDown {
+			b.snakeDirection = geometry.DirUp
 		}
 	}
 
@@ -63,7 +79,7 @@ func (b *board) moveSnake(dir geometry.Direction) Status {
 
 func (b *board) advanceSnake() Status {
 	if b.needsToMoveSnake() {
-		b.snake.Move(b.direction)
+		b.snake.Move(b.snakeDirection)
 
 		if b.snakeCollidesWithWall() || b.snakeCollidesWithSelf() {
 			return StatusGameOver
@@ -88,7 +104,7 @@ func (b *board) initSnake() {
 }
 
 func (b *board) needsToMoveSnake() bool {
-	return b.timer%b.speed == 0
+	return b.timer%b.snakeSpeed == 0
 }
 
 func (b *board) snakeCollidesWithWall() bool {
@@ -114,16 +130,4 @@ func (b *board) snakeEatsApple() bool {
 	appleShape := b.apple.GetShape()[0]
 	snakeHead := b.snake.GetShape()[0]
 	return snakeHead.X == appleShape.X && snakeHead.Y == appleShape.Y
-}
-
-func (b *board) SetSpeed(speed int) {
-	b.speed = speed
-}
-
-func (b *board) GetSnake() *characters.Snake {
-	return b.snake
-}
-
-func (b *board) GetApple() *characters.Apple {
-	return b.apple
 }
