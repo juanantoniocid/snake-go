@@ -1,10 +1,7 @@
 package play
 
 import (
-	"math/rand"
-
 	"juanantoniocid/snake/internal/geometry"
-	"juanantoniocid/snake/internal/play/characters"
 )
 
 type Status int
@@ -12,54 +9,30 @@ type Status int
 const (
 	StatusInitial Status = iota
 	StatusPlaying
+	StatusSnakeEating
 	StatusGameOver
 )
 
 // Play is the main game struct
 type Play struct {
-	boardWidth  int
-	boardHeight int
+	board *board
 
-	snake *characters.Snake
-	apple *characters.Apple
-
-	status        Status
-	timer         int
-	moveDirection geometry.Direction
-	score         int
-	moveTime      int
-	level         int
+	status Status
+	score  int
+	level  int
 }
 
 // NewPlay creates a new game
 func NewPlay(width, height int) *Play {
 	g := &Play{
-		boardWidth:  width,
-		boardHeight: height,
+		board: newBoard(width, height),
+
+		status: StatusInitial,
+		score:  0,
+		level:  1,
 	}
-	g.Reset()
 
 	return g
-}
-
-// Reset resets the game
-func (p *Play) Reset() {
-	p.initApple()
-	p.initSnake()
-	p.setLevel()
-
-	p.status = StatusInitial
-	p.timer = 0
-	p.moveDirection = geometry.DirNone
-	p.score = 0
-}
-
-func (p *Play) initApple() {
-	p.apple = characters.NewApple(rand.Intn(p.boardWidth-1), rand.Intn(p.boardHeight-1))
-}
-
-func (p *Play) initSnake() {
-	p.snake = characters.NewSnake(p.boardWidth/2, p.boardHeight/2)
 }
 
 // GetStatus returns the current game status
@@ -79,10 +52,45 @@ func (p *Play) GetLevel() int {
 
 // GetSnakeShape returns the current snake shape
 func (p *Play) GetSnakeShape() geometry.Shape {
-	return p.snake.GetShape()
+	return p.board.GetSnakeShape()
 }
 
 // GetAppleShape returns the current apple shape
 func (p *Play) GetAppleShape() geometry.Shape {
-	return p.apple.GetShape()
+	return p.board.GetAppleShape()
+}
+
+// MoveSnake moves the snake in the given direction
+func (p *Play) MoveSnake(dir geometry.Direction) {
+	if p.status == StatusGameOver {
+		return
+	}
+
+	p.status = p.board.MoveSnake(dir)
+	if p.status == StatusSnakeEating {
+		p.increaseScore()
+		p.status = StatusPlaying
+		return
+	}
+}
+
+func (p *Play) increaseScore() {
+	var speed int
+	p.score++
+
+	if p.score < 10 {
+		p.level = 1
+		speed = 4
+	} else if p.score < 20 {
+		p.level = 2
+		speed = 3
+	} else if p.score < 30 {
+		p.level = 3
+		speed = 2
+	} else {
+		p.level = 4
+		speed = 1
+	}
+
+	p.board.SetSpeed(speed)
 }

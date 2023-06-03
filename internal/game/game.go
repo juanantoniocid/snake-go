@@ -40,13 +40,13 @@ func (g *Game) iterate() {
 
 	if g.play.GetStatus() == play.StatusGameOver {
 		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-			g.play.Reset()
+			g.reset()
 			dir = geometry.DirUp
 		}
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		g.play.Reset()
+		g.reset()
 		return
 	}
 
@@ -64,6 +64,10 @@ func (g *Game) iterate() {
 		dir = geometry.DirRight
 	}
 	g.play.MoveSnake(dir)
+}
+
+func (g *Game) reset() {
+	g.play = play.NewPlay(width/int(gridSize), height/int(gridSize))
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
