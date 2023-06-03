@@ -15,34 +15,24 @@ const (
 
 // Play is the main game struct
 type Play struct {
-	board       *board
-	boardWidth  int
-	boardHeight int
+	board *board
 
 	status Status
-
-	score int
-	level int
+	score  int
+	level  int
 }
 
 // NewPlay creates a new game
 func NewPlay(width, height int) *Play {
 	g := &Play{
-		boardWidth:  width,
-		boardHeight: height,
+		board: newBoard(width, height),
+
+		status: StatusInitial,
+		score:  0,
 	}
-	g.Reset()
+	g.setLevel()
 
 	return g
-}
-
-// Reset resets the game
-func (p *Play) Reset() {
-	p.board = newBoard(p.boardWidth, p.boardHeight)
-	p.setLevel()
-
-	p.status = StatusInitial
-	p.score = 0
 }
 
 // GetStatus returns the current game status
