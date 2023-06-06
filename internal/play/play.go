@@ -80,15 +80,18 @@ func (p *Play) increaseScore() {
 
 	if p.score < 10 {
 		p.level = 1
-		speed = 4
+		speed = 5
 	} else if p.score < 20 {
 		p.level = 2
-		speed = 3
+		speed = 4
 	} else if p.score < 30 {
 		p.level = 3
+		speed = 3
+	} else if p.score < 40 {
+		p.level = 4
 		speed = 2
 	} else {
-		p.level = 4
+		p.level = 5
 		speed = 1
 	}
 

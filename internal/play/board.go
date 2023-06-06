@@ -24,7 +24,7 @@ func newBoard(width, height int) *board {
 		width:          width,
 		height:         height,
 		snakeDirection: geometry.DirNone,
-		snakeSpeed:     4,
+		snakeSpeed:     5,
 		timer:          0,
 	}
 
@@ -56,29 +56,30 @@ func (b *board) MoveSnake(dir geometry.Direction) Status {
 }
 
 func (b *board) moveSnake(dir geometry.Direction) Status {
-	if dir == geometry.DirLeft {
-		if b.snakeDirection != geometry.DirRight {
-			b.snakeDirection = geometry.DirLeft
-		}
-	} else if dir == geometry.DirRight {
-		if b.snakeDirection != geometry.DirLeft {
-			b.snakeDirection = geometry.DirRight
-		}
-	} else if dir == geometry.DirDown {
-		if b.snakeDirection != geometry.DirUp {
-			b.snakeDirection = geometry.DirDown
-		}
-	} else if dir == geometry.DirUp {
-		if b.snakeDirection != geometry.DirDown {
-			b.snakeDirection = geometry.DirUp
-		}
+	var forceAdvance bool
+	if dir != b.snakeDirection && b.turnAllowed(dir) {
+		forceAdvance = true
+		b.snakeDirection = dir
 	}
 
-	return b.advanceSnake()
+	return b.advanceSnake(forceAdvance)
 }
 
-func (b *board) advanceSnake() Status {
-	if b.needsToMoveSnake() {
+func (b *board) turnAllowed(dir geometry.Direction) bool {
+	if dir == geometry.DirLeft {
+		return b.snakeDirection != geometry.DirRight
+	} else if dir == geometry.DirRight {
+		return b.snakeDirection != geometry.DirLeft
+	} else if dir == geometry.DirDown {
+		return b.snakeDirection != geometry.DirUp
+	} else if dir == geometry.DirUp {
+		return b.snakeDirection != geometry.DirDown
+	}
+	return false
+}
+
+func (b *board) advanceSnake(force bool) Status {
+	if b.needsToMoveSnake() || force {
 		b.snake.Move(b.snakeDirection)
 
 		if b.snakeCollidesWithWall() || b.snakeCollidesWithSelf() {
