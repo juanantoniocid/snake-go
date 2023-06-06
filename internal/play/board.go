@@ -24,7 +24,7 @@ func newBoard(width, height int) *board {
 		width:          width,
 		height:         height,
 		snakeDirection: geometry.DirNone,
-		snakeSpeed:     4,
+		snakeSpeed:     5,
 		timer:          0,
 	}
 
